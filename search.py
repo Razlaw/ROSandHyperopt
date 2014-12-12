@@ -7,17 +7,17 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 # specification of the search space. First a choice between two methods. The second one with different parameters. After that to general parameters that allways have to be tuned 
-space = [hp.choice('SURFELmapMethod',
+space = [hp.choice('choiceAorB',
 		# first choice, no parameters 
 		[{'type': 1, 'scanToScan': 1},
-		# second choice, parameters are resolution, levels and cellCapacity. resolution is a nested choice 
+		# second choice, parameters are choiceBchoice, choiceBint and choiceBint2. choiceBchoice is a nested choice 
 		{'type': 2, 'MRSmapMethod': 2,
-			'resolution': hp.choice('resolution',[ 2, 3, 4, 5, 6, 8, 9, 10, 11, 12, 16, 17, 18, 19, 20]),
-			'levels': hp.quniform('levels', 1, 5, 1),
-			'cellCapacity': hp.quniform('cellCapacity', 50, 5000, 50)}]),
+			'choiceBchoice': hp.choice('choiceBchoice',[ 2, 3, 4, 5, 6, 8, 9, 10, 11, 12, 16, 17, 18, 19, 20]),
+			'choiceBint': hp.quniform('choiceBint', 1, 5, 1),
+			'choiceBint2': hp.quniform('choiceBint2', 50, 5000, 50)}]),
 		# two parameters that allways have to be tuned 
-			hp.quniform('SURFELPriorProb', 0.05, 0.95, 0.05),						
-			hp.quniform('maxIterations', 20, 100, 5)]
+			hp.quniform('allwaysDouble', 0.05, 0.95, 0.05),						
+			hp.quniform('allwaysInteger', 20, 100, 5)]
 			
 # holds all values with the exp_key specified in the Makefile
 # if ip (localhost), port (27017) or name of the database (razlaw) were changed in the Makefile, these changes have to be applied here as well  
@@ -60,8 +60,8 @@ elif sys.argv[1] == "trialsToLoss":
 
 	# name the axes and plot 
 	plt.xlabel('Timestamp')
-	plt.ylabel('ATE [m]')
-	plt.title('Surfelregistration')
+	plt.ylabel('Loss')
+	plt.title('Title of Plot')
 	
 	# plot a horizontal line e.g. the bassline for the result with standard parameters 
 	line = plt.axhline(y=0.028346, xmin=0.0, xmax=1.0)
@@ -71,36 +71,36 @@ elif sys.argv[1] == "trialsToLoss":
 	plt.show()
 
 # case for make showone and showtwo
-elif sys.argv[1] == "ateMaxIter":
+elif sys.argv[1] == "lossToInt":
 	# similar to the case above to filter "ok" and "fail" trials
 	oktrials = [t for t in trials.trials if t["result"]["status"] == "ok"]
 	failtrials = [t for t in trials.trials if t["result"]["status"] == "fail"]
 	# if you only want to plot the results for one of the choices, this is a possible way  
-	mapMethod = int(sys.argv[3])
-	if mapMethod == 1.0:
+	choice = int(sys.argv[3])
+	if choice == 1.0:
 		# filter all the trials where the first choice was used 
 		# beware that the first choice has the number 0
-		maptrials = [t for t in oktrials if t['misc']['vals']['SURFELmapMethod'] == [0.0]]
-		failmaptrials = [t for t in failtrials if t['misc']['vals']['SURFELmapMethod'] == [0.0]]
-	elif mapMethod == 2.0:
-		maptrials = [t for t in oktrials if t['misc']['vals']['SURFELmapMethod'] == [1.0]]
-		failmaptrials = [t for t in failtrials if t['misc']['vals']['SURFELmapMethod'] == [1.0]]
+		maptrials = [t for t in oktrials if t['misc']['vals']['choiceAorB'] == [0.0]]
+		failmaptrials = [t for t in failtrials if t['misc']['vals']['choiceAorB'] == [0.0]]
+	elif choice == 2.0:
+		maptrials = [t for t in oktrials if t['misc']['vals']['choiceAorB'] == [1.0]]
+		failmaptrials = [t for t in failtrials if t['misc']['vals']['choiceAorB'] == [1.0]]
 
-	# now we filter again to get the loss that corresponds to a certain value of "maxIterations" 
+	# now we filter again to get the loss that corresponds to a certain value of "allwaysInteger" 
 	# beware that the loss is scattered on the x-axis this time 
 	tids = [t['result']['loss'] for t in maptrials]
-	cases = [t['misc']['vals']['maxIterations'] for t in maptrials]
+	cases = [t['misc']['vals']['allwaysInteger'] for t in maptrials]
 	failtids = [t['result']['loss'] for t in failmaptrials]
-	failcases = [t['misc']['vals']['maxIterations'] for t in failmaptrials]
+	failcases = [t['misc']['vals']['allwaysInteger'] for t in failmaptrials]
 	
 	# scattering as usual
 	_a = plt.scatter(failtids, failcases, c='red', marker='x', label='fail', alpha=0.5)
 	_b = plt.scatter(tids, cases, c='green', label='ok')
 
 	# name as usual 
-	plt.xlabel('ATE [m]')
-	plt.ylabel('maxIterations')
-	plt.title('Surfelregistration')
+	plt.xlabel('Loss')
+	plt.ylabel('allwaysInteger')
+	plt.title('Title of Plot')
 	
 	# this time we use a vertical line to display the baseline, since the loss is on the x axis  
 	line = plt.axvline(x=0.028346, ymin=0.0, ymax=1.0)
