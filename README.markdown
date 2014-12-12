@@ -9,6 +9,8 @@ For a general tutorial on the usage of hyperopt visit:
 
 ## Included Files 
 
+These files are a cutout of a project to optimize parameters for registration methods. 
+
 Makefile: to save some typing. 
 
 search.py: defining the borders for the search and including some code to plot the results.
@@ -23,11 +25,18 @@ Assuming we have a ROS node with fitting parameters, a costfunction that has to 
 
 1. Decide how many nodes you want to run parallel and start this many roscores as shown in steps 2 to 5 
 
-2. Start the first roscore as usual (port = 11311) 
+2. Start the first roscore as usual using port 11311
 
-3. For a new roscore first start a new terminal and export a new ROS_MASTER_URI by "export ROS_MASTER_URI=http://localhost:11312" (here port 11312 is used)
+         roscore 
 
-4. Then start the new core by "roscore -p 11312" 
+3. For a new roscore first start a new terminal and export a new ROS_MASTER_URI by 
+
+         export ROS_MASTER_URI=http://localhost:11312
+  here port 11312 is used
+
+4. Then start the new core by 
+
+         roscore -p 11312
 
 5. For each new roscore repeat steps 3 and 4 and increase the port number (11312 -> 11313 -> .. )  
 
