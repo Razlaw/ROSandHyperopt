@@ -12,7 +12,7 @@ server:
 # takes the jobs out of the queue and returns the result of the task 
 # --mongo=localhost:27017/razlaw has to fit to your database and to the trials variable in search.py, 27017 is the default port and razlaw is the name of the used database 
 client:
-	PYTHONPATH=`pwd` hyperopt-mongo-worker --mongo=localhost:27017/razlaw --poll-interval=30 --exp-key=$(EXPKEY)
+	PYTHONPATH=`pwd` hyperopt-mongo-worker --mongo=localhost:27017/razlaw --poll-interval=5 --exp-key=$(EXPKEY)
 
 # plots plots
 show:
@@ -27,10 +27,10 @@ show:
 
 # examples how to colourize different bool choices in the search space  
 showone:
-	python search.py ateMaxIter $(EXPKEY) 1
+	python search.py lossToInt $(EXPKEY) 1
 
 showtwo:
-	python search.py ateMaxIter $(EXPKEY) 2
+	python search.py lossToInt $(EXPKEY) 2
 
 # return all values of the best trial 
 best:
