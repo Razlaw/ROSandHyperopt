@@ -9,8 +9,8 @@ import time
 # definition of the job the client has to work on 
 def objective(args):
 	# get the parameters defined in the search space 
-	# beware that SURFELmapMethod is the "choice-tuple", and SURFELPriorProb and maxIterations are the values that allways have to be tuned
-	SURFELmapMethod, SURFELPriorProb, maxIterations = args
+	# beware that choiceAorB is the "choice-tuple", and allwaysDouble and allwaysInteger are the values that allways have to be tuned
+	choiceAorB, allwaysDouble, allwaysInteger = args
 	
 	# this part is essential for having multiple clients working parallel on equal ROS nodes 
 	print "starting subprocess"
@@ -39,13 +39,13 @@ def objective(args):
 	# measure time if needed 
 	start = time.time()
 	# in case the first choice in the search space was made 
-	if SURFELmapMethod['type'] == 1:	
+	if choiceAorB['type'] == 1:	
 		# export a new ROS_MASTER_URI to use the unused roscore and then run rosrun as always, parameters can be set by _parameter:=value 
 		# if you use a catkin workspace be aware that rosrun might search in the bin folder of the package for an executable, creating a symlink fixes this problem 
-		command = "export ROS_MASTER_URI=http://localhost:%s && rosrun mod_mapping multires_surfel_registration _threadID:=%s _regMeth:=3 _mapMeth:=%s _maxIter:=%s _SURFELPriorProb:=%s" % (port,threadid,SURFELmapMethod['type'],maxIterations,SURFELPriorProb)	
+		command = "export ROS_MASTER_URI=http://localhost:%s && rosrun HyperoptROS hyperopt_ros _threadID:=%s _aConstant:=3 _choiceAorB:=%s _allwaysInteger:=%s _allwaysDouble:=%s" % (port,threadid,choiceAorB['type'],allwaysInteger,allwaysDouble)	
 	# case of second choice, works analogously 
-	elif SURFELmapMethod['type'] == 2:	
-		command = "export ROS_MASTER_URI=http://localhost:%s && rosrun mod_mapping multires_surfel_registration _threadID:=%s _regMeth:=3 _mapMeth:=%s _MRSResolution:=%s _MRSLevels:=%s _MRSCellCapacity:=%s _maxIter:=%s _SURFELPriorProb:=%s" % (port,threadid,SURFELmapMethod['type'],SURFELmapMethod['resolution'],SURFELmapMethod['levels'],SURFELmapMethod['cellCapacity'],maxIterations,SURFELPriorProb)	
+	elif choiceAorB['type'] == 2:	
+		command = "export ROS_MASTER_URI=http://localhost:%s && rosrun HyperoptROS hyperopt_ros _threadID:=%s _aConstant:=3 _choiceAorB:=%s _choiceBchoice:=%s _choiceBint:=%s _choiceBint2:=%s _allwaysInteger:=%s _allwaysDouble:=%s" % (port,threadid,choiceAorB['type'],choiceAorB['choiceBchoice'],choiceAorB['choiceBint'],choiceAorB['choiceBint2'],allwaysInteger,allwaysDouble)	
 
 	# for checking whether the command was right or which constellations cause problems 
 	print command	
@@ -64,13 +64,13 @@ def objective(args):
 	assert len(proc_out) == 5
 	assert len(proc_out[-1]) == 0
 	# transform the results to float values and store them in the right variables 
-	ate, entr, timeStamp, regFailedPercent = (float(x) for x in proc_out[:-1])
+	loss, otherOutput, timeStamp, random = (float(x) for x in proc_out[:-1])
 	# print results, helps finding wrong results 
-	print "ERGEBNIS ate=%2.3f, entropy=%2.3f, timeStamp=%2.3f, regFailedPercent=%2.3f" % (ate,entr,timeStamp,regFailedPercent)
+	print "ERGEBNIS loss=%2.3f, otherOutput=%2.3f, timeStamp=%2.3f, random=%2.3f" % (loss,otherOutput,timeStamp,random)
 	# return the results to hyperopt, loss is always the value that has to be minimized and status is always a bool that shows hyperopt whether this run was ok 
 	# other return values are only stored in the database, a unique stamp helps finding results in the database 
-	return {'loss': ate,
-			'status': STATUS_FAIL if (ate < 0.00001 or regFailedPercent > 50) else STATUS_OK,
-			'entropy': entr,
+	return {'loss': loss,
+			'status': STATUS_FAIL if (loss < 0.00001 or random > 50) else STATUS_OK,
+			'otherOutput': otherOutput,
 			'timeStamp': timeStamp,
-			'regFailedPercent': regFailedPercent}
+			'random': random}
