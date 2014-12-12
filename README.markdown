@@ -9,7 +9,7 @@ For a general tutorial on the usage of hyperopt visit:
 
 ## Included Files 
 
-These files are a cutout of a project to optimize parameters for registration methods. 
+The ROS package HyperoptROS as a basic example how to get parameter values from Hyperopt and return the results. 
 
 Makefile: to save some typing. 
 
@@ -21,7 +21,9 @@ taskreg.py: to start ROS nodes parallel and get results of each one.
 
 Install the Hyperopt and MongoDB. 
 
-Assuming we have a ROS node with fitting parameters, a costfunction that has to be minimized and an output that prints this value, we can now start the optimization.
+HyperoptROS is a hydro catkin package containing a node with fitting parameters, a costfunction that has to be minimized and an output that prints this value, we can now start the optimization.
+
+0. Copy the package into your workspace, run catkin_make and create a symlink in ``.../HyperoptROS/bin`` pointing to ``.../yourWorkspace/devel/lib/HyperoptROS/hyperopt_ros``
 
 1. Decide how many nodes you want to run parallel and start this many roscores as shown in steps 2 to 5 
 
